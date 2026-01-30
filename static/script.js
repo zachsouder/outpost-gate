@@ -18,7 +18,16 @@ class GateController {
         this.startPolling();
     }
 
-    startPolling() {
+    async startPolling() {
+        // Get current state timestamp so we ignore old events
+        try {
+            const response = await fetch('/api/gate/status');
+            const state = await response.json();
+            this.lastTimestamp = state.timestamp || 0;
+        } catch (e) {
+            // Start fresh if fetch fails
+        }
+
         this.statusIndicator.classList.add('connected');
         this.statusText.textContent = 'Ready for authorization';
 
