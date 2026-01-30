@@ -16,12 +16,14 @@ API_KEY = os.getenv("GATE_API_KEY", "demo-key-change-me")
 gate_state = {
     "is_open": False,
     "name": "",
+    "dock": "",
     "timestamp": 0,
 }
 
 
 class GateOpenRequest(BaseModel):
     name: str
+    dock: int | str
 
 
 class GateOpenResponse(BaseModel):
@@ -51,9 +53,10 @@ async def open_gate(
 
     gate_state["is_open"] = True
     gate_state["name"] = request.name
+    gate_state["dock"] = request.dock
     gate_state["timestamp"] = time.time()
 
-    print(f"[Gate] Opening for {request.name}")
+    print(f"[Gate] Opening for {request.name} -> Dock {request.dock}")
 
     return GateOpenResponse(
         success=True,

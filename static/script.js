@@ -5,6 +5,8 @@ class GateController {
         this.gateContainer = document.getElementById('gateContainer');
         this.welcomeBanner = document.getElementById('welcomeBanner');
         this.welcomeText = document.getElementById('welcomeText');
+        this.dockMessage = document.getElementById('dockMessage');
+        this.dockText = document.getElementById('dockText');
         this.statusIndicator = document.getElementById('statusIndicator');
         this.statusText = document.getElementById('statusText');
         this.gateScene = document.querySelector('.gate-scene');
@@ -32,14 +34,14 @@ class GateController {
             // Check if this is a new gate open event
             if (state.is_open && state.timestamp > this.lastTimestamp) {
                 this.lastTimestamp = state.timestamp;
-                this.openGate(state.name);
+                this.openGate(state.name, state.dock);
             }
         } catch (error) {
             console.error('[Gate] Poll error:', error);
         }
     }
 
-    openGate(name) {
+    openGate(name, dock) {
         if (this.autoCloseTimeout) {
             clearTimeout(this.autoCloseTimeout);
         }
@@ -47,6 +49,10 @@ class GateController {
         // Update welcome message
         this.welcomeText.textContent = `WELCOME, ${name.toUpperCase()}!`;
         this.welcomeBanner.classList.add('active');
+
+        // Show dock instructions
+        this.dockText.textContent = `Please proceed to Dock Door ${dock}`;
+        this.dockMessage.classList.add('active');
 
         // Update status
         this.statusIndicator.classList.add('active');
@@ -79,6 +85,7 @@ class GateController {
         setTimeout(() => {
             this.welcomeText.textContent = 'OUTPOST ACCESS';
             this.welcomeBanner.classList.remove('active');
+            this.dockMessage.classList.remove('active');
             this.statusIndicator.classList.remove('active');
             this.statusText.textContent = 'Ready for authorization';
         }, 1200);

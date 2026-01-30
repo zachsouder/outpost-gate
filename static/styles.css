@@ -397,6 +397,32 @@ body {
     animation: welcome-bounce 0.6s ease-in-out 2;
 }
 
+/* Dock Message */
+.dock-message {
+    background: var(--white);
+    border: 5px solid #000;
+    box-shadow: var(--shadow);
+    padding: 15px 40px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.4s ease-out;
+    pointer-events: none;
+}
+
+.dock-message.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+#dockText {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #000;
+    letter-spacing: 2px;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .building {
@@ -437,5 +463,13 @@ body {
 
     .welcome-banner {
         padding: 15px 30px;
+    }
+
+    .dock-message {
+        padding: 12px 20px;
+    }
+
+    #dockText {
+        font-size: 1.2rem;
     }
 }
