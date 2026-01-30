@@ -22,10 +22,14 @@ class GateController {
         const eventSource = new EventSource('/api/gate/events');
 
         eventSource.onopen = () => {
+            console.log('[Gate] SSE stream opened');
+        };
+
+        eventSource.addEventListener('connected', () => {
             console.log('[Gate] SSE connected!');
             this.statusIndicator.classList.add('connected');
             this.statusText.textContent = 'Ready for authorization';
-        };
+        });
 
         eventSource.addEventListener('gate_open', (event) => {
             console.log('[Gate] Received gate_open event:', event.data);

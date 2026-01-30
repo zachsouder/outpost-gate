@@ -97,6 +97,9 @@ async def gate_events(request: Request):
     print(f"[Gate] New SSE client connected. Total clients: {len(event_queues)}")
 
     async def event_generator():
+        # Send immediate connection confirmation
+        yield {"event": "connected", "data": ""}
+
         try:
             while True:
                 if await request.is_disconnected():
