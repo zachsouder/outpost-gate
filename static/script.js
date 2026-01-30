@@ -1,4 +1,4 @@
-// Gate Demo - Real-time control via SSE
+// Gate Demo - Polling for state updates
 
 class GateController {
     constructor() {
@@ -10,58 +10,33 @@ class GateController {
         this.gateScene = document.querySelector('.gate-scene');
 
         this.isOpen = false;
+        this.lastTimestamp = 0;
         this.autoCloseTimeout = null;
 
-        this.connectSSE();
+        this.startPolling();
     }
 
-    connectSSE() {
-        this.statusText.textContent = 'Connecting...';
-        console.log('[Gate] Connecting to SSE...');
+    startPolling() {
+        this.statusIndicator.classList.add('connected');
+        this.statusText.textContent = 'Ready for authorization';
 
-        const eventSource = new EventSource('/api/gate/events');
+        // Poll every second
+        setInterval(() => this.checkStatus(), 1000);
+    }
 
-        eventSource.onopen = () => {
-            console.log('[Gate] SSE stream opened');
-        };
+    async checkStatus() {
+        try {
+            const response = await fetch('/api/gate/status');
+            const state = await response.json();
 
-        eventSource.addEventListener('connected', () => {
-            console.log('[Gate] SSE connected!');
-            this.statusIndicator.classList.add('connected');
-            this.statusText.textContent = 'Ready for authorization';
-        });
-
-        eventSource.addEventListener('gate_open', (event) => {
-            console.log('[Gate] Received gate_open event:', event.data);
-            const name = event.data;
-            this.openGate(name);
-        });
-
-        eventSource.addEventListener('gate_close', () => {
-            console.log('[Gate] Received gate_close event');
-            this.closeGate();
-        });
-
-        eventSource.addEventListener('keepalive', () => {
-            console.log('[Gate] Keepalive received');
-        });
-
-        eventSource.onmessage = (event) => {
-            console.log('[Gate] Generic message:', event);
-        };
-
-        eventSource.onerror = (err) => {
-            console.error('[Gate] SSE error:', err);
-            this.statusIndicator.classList.remove('connected');
-            this.statusText.textContent = 'Connection lost. Reconnecting...';
-
-            // EventSource will auto-reconnect, but update UI
-            setTimeout(() => {
-                if (eventSource.readyState === EventSource.CONNECTING) {
-                    this.statusText.textContent = 'Reconnecting...';
-                }
-            }, 1000);
-        };
+            // Check if this is a new gate open event
+            if (state.is_open && state.timestamp > this.lastTimestamp) {
+                this.lastTimestamp = state.timestamp;
+                this.openGate(state.name);
+            }
+        } catch (error) {
+            console.error('[Gate] Poll error:', error);
+        }
     }
 
     openGate(name) {

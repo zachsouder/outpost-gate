@@ -1,21 +1,23 @@
 import os
-import asyncio
-from contextlib import asynccontextmanager
+import time
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from sse_starlette.sse import EventSourceResponse
 from dotenv import load_dotenv
 
 load_dotenv()
 
 API_KEY = os.getenv("GATE_API_KEY", "demo-key-change-me")
 
-# Event queue for SSE connections
-event_queues: list[asyncio.Queue] = []
+# Simple state store for polling
+gate_state = {
+    "is_open": False,
+    "name": "",
+    "timestamp": 0,
+}
 
 
 class GateOpenRequest(BaseModel):
@@ -28,18 +30,9 @@ class GateOpenResponse(BaseModel):
     name: str
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    yield
-    # Cleanup: close all event queues
-    for queue in event_queues:
-        await queue.put(None)
-
-
 app = FastAPI(
     title="Rila Gate Demo",
     description="Trade show demo for Outpost gate access",
-    lifespan=lifespan,
 )
 
 
@@ -56,11 +49,11 @@ async def open_gate(
     if x_api_key != API_KEY:
         raise HTTPException(status_code=401, detail="Invalid API key")
 
-    # Broadcast gate open event to all connected clients
-    event_data = {"type": "gate_open", "name": request.name}
-    print(f"[Gate] Broadcasting to {len(event_queues)} connected clients: {event_data}")
-    for queue in event_queues:
-        await queue.put(event_data)
+    gate_state["is_open"] = True
+    gate_state["name"] = request.name
+    gate_state["timestamp"] = time.time()
+
+    print(f"[Gate] Opening for {request.name}")
 
     return GateOpenResponse(
         success=True,
@@ -79,54 +72,18 @@ async def close_gate(
     if x_api_key != API_KEY:
         raise HTTPException(status_code=401, detail="Invalid API key")
 
-    # Broadcast gate close event
-    event_data = {"type": "gate_close"}
-    for queue in event_queues:
-        await queue.put(event_data)
+    gate_state["is_open"] = False
+    gate_state["name"] = ""
 
     return {"success": True, "message": "Gate closed"}
 
 
-@app.get("/api/gate/events")
-async def gate_events(request: Request):
+@app.get("/api/gate/status")
+async def gate_status():
     """
-    Server-Sent Events endpoint for real-time gate updates.
+    Poll endpoint for gate state.
     """
-    queue: asyncio.Queue = asyncio.Queue()
-    event_queues.append(queue)
-    print(f"[Gate] New SSE client connected. Total clients: {len(event_queues)}")
-
-    async def event_generator():
-        # Send immediate connection confirmation
-        yield {"event": "connected", "data": ""}
-
-        try:
-            while True:
-                if await request.is_disconnected():
-                    break
-
-                try:
-                    event = await asyncio.wait_for(queue.get(), timeout=15.0)
-                    if event is None:
-                        break
-                    yield {
-                        "event": event["type"],
-                        "data": event.get("name", ""),
-                    }
-                except asyncio.TimeoutError:
-                    # Send keepalive
-                    yield {"event": "keepalive", "data": ""}
-        finally:
-            event_queues.remove(queue)
-            print(f"[Gate] SSE client disconnected. Remaining clients: {len(event_queues)}")
-
-    return EventSourceResponse(
-        event_generator(),
-        headers={
-            "X-Accel-Buffering": "no",  # Disable Nginx buffering
-            "Cache-Control": "no-cache",
-        },
-    )
+    return gate_state
 
 
 @app.get("/")
