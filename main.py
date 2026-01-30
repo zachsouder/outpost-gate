@@ -106,7 +106,7 @@ async def gate_events(request: Request):
                     break
 
                 try:
-                    event = await asyncio.wait_for(queue.get(), timeout=30.0)
+                    event = await asyncio.wait_for(queue.get(), timeout=15.0)
                     if event is None:
                         break
                     yield {
@@ -120,7 +120,13 @@ async def gate_events(request: Request):
             event_queues.remove(queue)
             print(f"[Gate] SSE client disconnected. Remaining clients: {len(event_queues)}")
 
-    return EventSourceResponse(event_generator())
+    return EventSourceResponse(
+        event_generator(),
+        headers={
+            "X-Accel-Buffering": "no",  # Disable Nginx buffering
+            "Cache-Control": "no-cache",
+        },
+    )
 
 
 @app.get("/")
