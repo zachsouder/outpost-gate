@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outpost Gate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-banner" id="welcomeBanner">
+            <span class="welcome-text" id="welcomeText">OUTPOST ACCESS</span>
+        </div>
+
+        <div class="gate-scene">
+            <div class="building left"></div>
+            <div class="building right"></div>
+
+            <div class="gate-frame">
+                <div class="gate-container" id="gateContainer">
+                    <div class="gate-panel left" id="gateLeft">
+                        <div class="gate-bars">
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                        <div class="logo-half left">
+                            <img src="/static/outpost-logo.png" alt="Outpost" class="logo-img">
+                        </div>
+                    </div>
+                    <div class="gate-panel right" id="gateRight">
+                        <div class="gate-bars">
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                        <div class="logo-half right">
+                            <img src="/static/outpost-logo.png" alt="Outpost" class="logo-img">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gate-post left"></div>
+                <div class="gate-post right"></div>
+            </div>
+
+            <div class="ground"></div>
+        </div>
+
+        <div class="status-bar" id="statusBar">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <span id="statusText">Waiting for authorization...</span>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
