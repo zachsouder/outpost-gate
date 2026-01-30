@@ -65,10 +65,10 @@ class GateController {
         this.gateContainer.classList.add('open');
         this.isOpen = true;
 
-        // Auto-close after 8 seconds
+        // Auto-close after 12 seconds (4s open + 4s visible + 4s close)
         this.autoCloseTimeout = setTimeout(() => {
             this.closeGate();
-        }, 8000);
+        }, 12000);
     }
 
     closeGate() {
@@ -81,14 +81,14 @@ class GateController {
         this.gateContainer.classList.remove('open');
         this.isOpen = false;
 
-        // Reset welcome message after gate closes
+        // Reset welcome message after gate closes (wait for 4s animation)
         setTimeout(() => {
             this.welcomeText.textContent = 'OUTPOST ACCESS';
             this.welcomeBanner.classList.remove('active');
             this.dockMessage.classList.remove('active');
             this.statusIndicator.classList.remove('active');
             this.statusText.textContent = 'Ready for authorization';
-        }, 1200);
+        }, 4000);
     }
 
     createSparkles() {

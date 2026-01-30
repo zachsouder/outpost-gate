@@ -31,8 +31,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 40px;
-    padding: 20px;
+    gap: 20px;
+    padding: 10px 20px;
 }
 
 /* Welcome Banner */
@@ -69,7 +69,7 @@ body {
     position: relative;
     width: 100%;
     max-width: 800px;
-    height: 500px;
+    height: 400px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -190,7 +190,7 @@ body {
     background: var(--darker);
     border: 5px solid #000;
     position: relative;
-    transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow: hidden;
 }
 
@@ -452,8 +452,33 @@ body {
 }
 
 @media (max-width: 600px) {
+    .container {
+        gap: 15px;
+        padding: 5px 10px;
+    }
+
     .building {
         display: none;
+    }
+
+    .gate-scene {
+        height: 280px;
+    }
+
+    .gate-frame {
+        width: 260px;
+        height: 240px;
+    }
+
+    .gate-post {
+        width: 25px;
+        height: 210px;
+    }
+
+    .gate-container {
+        left: 25px;
+        right: 25px;
+        height: 180px;
     }
 
     .welcome-text {
@@ -462,14 +487,19 @@ body {
     }
 
     .welcome-banner {
-        padding: 15px 30px;
+        padding: 12px 25px;
     }
 
     .dock-message {
-        padding: 12px 20px;
+        padding: 10px 15px;
     }
 
     #dockText {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+    }
+
+    .status-bar {
+        padding: 10px 20px;
+        font-size: 1rem;
     }
 }
